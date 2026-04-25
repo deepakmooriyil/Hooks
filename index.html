@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>100 Viral Hooks — Swipe File</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080810;
+      --surface: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e8f0;
+      --muted: #8888aa;
+      --dim: #555577;
+      --accent-default: #e94560;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: relative;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0d0d1a 100%);
+      border-bottom: 1px solid #2a2a4a;
+      padding: 56px 24px 44px;
+      text-align: center;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 28% 50%, rgba(138,43,226,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse at 72% 50%, rgba(233,69,96,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    header::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.025'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .header-inner { position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(233,69,96,0.15);
+      border: 1px solid rgba(233,69,96,0.4);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #e94560;
+      margin-bottom: 18px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 5.5vw, 56px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+    }
+    h1 em {
+      display: block;
+      font-style: italic;
+      font-weight: 400;
+      color: #7b68ee;
+      font-size: 0.62em;
+      letter-spacing: 0;
+      margin-top: 6px;
+    }
+    .header-sub {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ─── CONTROLS ─── */
+    .controls {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 28px 24px 0;
+    }
+
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-wrap::before {
+      content: '⌕';
+      position: absolute;
+      left: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--dim);
+      font-size: 20px;
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 13px 18px 13px 44px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #search::placeholder { color: var(--dim); }
+    #search:focus {
+      border-color: rgba(123,104,238,0.5);
+      box-shadow: 0 0 0 3px rgba(123,104,238,0.1);
+    }
+
+    /* ─── CATEGORY TABS ─── */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab {
+      padding: 7px 15px;
+      border-radius: 20px;
+      border: 1px solid #2a2a4a;
+      background: rgba(255,255,255,0.03);
+      color: #7777aa;
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab:hover { border-color: rgba(255,255,255,0.2); color: var(--muted); }
+    .tab.active {
+      /* dynamic via JS */
+    }
+
+    .count-bar {
+      color: var(--dim);
+      font-size: 13px;
+      margin-bottom: 16px;
+      font-family: 'DM Mono', monospace;
+    }
+    .count-bar strong { color: #9090cc; }
+
+    /* ─── HOOK CARDS ─── */
+    .hooks-list {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hook-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border-left-width: 3px;
+      border-left-style: solid;
+      animation: fadeUp 0.3s ease both;
+    }
+    .hook-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hook-inner { display: flex; align-items: flex-start; gap: 14px; }
+
+    .hook-num {
+      min-width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .hook-body { flex: 1; min-width: 0; }
+
+    .hook-cat {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .hook-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: #d8d8f0;
+      margin-bottom: 14px;
+    }
+
+    .why-box {
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.55;
+      font-family: 'DM Sans', sans-serif;
+      display: none;
+    }
+    .why-box.visible { display: block; }
+
+    .hook-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #aaaacc;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+    .btn.copied, .btn.why-active { /* set dynamically */ }
+
+    /* ─── NO RESULTS ─── */
+    .no-results {
+      text-align: center;
+      color: var(--dim);
+      padding: 60px 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0d0d1a; }
+    ::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a6a; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      header { padding: 40px 16px 32px; }
+      .controls { padding: 20px 16px 0; }
+      .hooks-list { padding: 0 16px 60px; }
+      .hook-text { font-size: 14.5px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="badge">Swipe File</div>
+    <h1>
+      100 Viral Hooks
+      <em>with the psychology behind each one</em>
+    </h1>
+    <p class="header-sub">10 psychological categories. Copy any hook, tap the brain icon to see why it works.</p>
+  </div>
+</header>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search hooks…" autocomplete="off" spellcheck="false" />
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="count-bar" id="count-bar">Showing <strong id="count">100</strong> hooks</div>
+</div>
+
+<!-- HOOKS -->
+<div class="hooks-list" id="hooks-list"></div>
+
+<script>
+const hooks = [
+  // CURIOSITY GAPS
+  { id: 1,  category: "Curiosity Gap", hook: "Nobody talks about this, but it changed everything for me.", why: "Creates mystery + social proof of transformation" },
+  { id: 2,  category: "Curiosity Gap", hook: "I spent 3 years figuring this out so you don't have to.", why: "Time-saving + implied insider knowledge" },
+  { id: 3,  category: "Curiosity Gap", hook: "The thing I wish someone told me before I started:", why: "Retroactive authority + promise of shortcuts" },
+  { id: 4,  category: "Curiosity Gap", hook: "This tiny detail is the reason most people fail.", why: "Specificity + mystery + fear of missing out" },
+  { id: 5,  category: "Curiosity Gap", hook: "They don't want you to know this exists.", why: "Conspiracy framing triggers forbidden knowledge desire" },
+  { id: 6,  category: "Curiosity Gap", hook: "I asked 100 [experts] one question. Here's what they said.", why: "Research authority + implies surprising answer" },
+  { id: 7,  category: "Curiosity Gap", hook: "The counterintuitive truth about [topic] that nobody admits:", why: "Challenges assumptions, creates intellectual curiosity" },
+  { id: 8,  category: "Curiosity Gap", hook: "Stop doing [common thing]. Do this instead.", why: "Pattern interrupt + implied superior alternative" },
+  { id: 9,  category: "Curiosity Gap", hook: "I was completely wrong about [topic] until I saw this.", why: "Vulnerability + intellectual honesty = trust" },
+  { id: 10, category: "Curiosity Gap", hook: "The most underrated [tool/habit/skill] that changed my life:", why: "Exclusivity framing + life-change promise" },
+
+  // FEAR & URGENCY
+  { id: 11, category: "Fear & Urgency", hook: "You're already behind if you don't know this.", why: "Loss aversion — fear of being left behind" },
+  { id: 12, category: "Fear & Urgency", hook: "This mistake is costing you [money/time/health] every day.", why: "Daily compounding loss creates immediate urgency" },
+  { id: 13, category: "Fear & Urgency", hook: "If you're still doing [thing], stop immediately.", why: "Authority command + fear of current harm" },
+  { id: 14, category: "Fear & Urgency", hook: "The thing silently ruining your [area of life]:", why: "Hidden danger = must-read to protect yourself" },
+  { id: 15, category: "Fear & Urgency", hook: "Most people find out too late. Don't be one of them.", why: "Social proof of failure + preemptive regret" },
+  { id: 16, category: "Fear & Urgency", hook: "The window for this is closing. Here's what I'd do now.", why: "Scarcity + implied insider action plan" },
+  { id: 17, category: "Fear & Urgency", hook: "[Industry] is changing. Are you prepared?", why: "Change anxiety + invites self-reflection" },
+  { id: 18, category: "Fear & Urgency", hook: "Warning: This advice sounds right but will hurt you.", why: "Counter-conventional + protective framing" },
+  { id: 19, category: "Fear & Urgency", hook: "I almost made this $[X] mistake. Here's how I caught it.", why: "Near-miss story = vicarious learning" },
+  { id: 20, category: "Fear & Urgency", hook: "The hidden cost of [common habit] nobody calculates:", why: "Unveiling hidden downside creates anxiety to learn" },
+
+  // SOCIAL PROOF
+  { id: 21, category: "Social Proof", hook: "People who earn $[X]+ all do this one thing.", why: "Aspirational identity + implied joining the elite" },
+  { id: 22, category: "Social Proof", hook: "This is what separates top 1% [performers] from everyone else.", why: "Elite distinction + identity trigger" },
+  { id: 23, category: "Social Proof", hook: "The most successful people I know all share this habit:", why: "Social proof by proximity + implied transferability" },
+  { id: 24, category: "Social Proof", hook: "After helping 1,000+ clients, here's what actually works:", why: "Volume authority + experience credibility" },
+  { id: 25, category: "Social Proof", hook: "This framework turned [ordinary person] into [result].", why: "Relatable transformation + replicable promise" },
+  { id: 26, category: "Social Proof", hook: "I've interviewed 50 [successful people]. Here's the pattern.", why: "Research + pattern recognition = wisdom" },
+  { id: 27, category: "Social Proof", hook: "Smart people do this. Here's why you should too.", why: "Intelligence signaling + social identity" },
+  { id: 28, category: "Social Proof", hook: "Everyone who succeeds at [goal] eventually figures this out.", why: "Inevitability framing = shortcut to success" },
+  { id: 29, category: "Social Proof", hook: "The habit that [famous person] credits for their success:", why: "Celebrity authority + implies accessible secret" },
+  { id: 30, category: "Social Proof", hook: "People are shocked when they learn this about [topic].", why: "Collective surprise = must know what it is" },
+
+  // TRANSFORMATION
+  { id: 31, category: "Transformation", hook: "I went from [bad state] to [good state] in [timeframe]. Here's how.", why: "Before/after contrast + timeline makes it believable" },
+  { id: 32, category: "Transformation", hook: "6 months ago I had [problem]. Now [result]. Thread:", why: "Personal story arc + compressed timeline" },
+  { id: 33, category: "Transformation", hook: "This single change added $[X] to my [income/savings].", why: "Specificity + singular causation makes it credible" },
+  { id: 34, category: "Transformation", hook: "The exact process I used to [achieve result] in [timeframe]:", why: "'Exact' signals specificity; replication is promised" },
+  { id: 35, category: "Transformation", hook: "What [X months] of [habit/work] actually looks like:", why: "Real process > polished highlight reel" },
+  { id: 36, category: "Transformation", hook: "I failed at [goal] for years until I changed one thing.", why: "Persistence + single variable = relatable and hopeful" },
+  { id: 37, category: "Transformation", hook: "Doing [simple thing] daily for 30 days changed my [area].", why: "Small action + big result = low barrier to believe" },
+  { id: 38, category: "Transformation", hook: "The boring strategy that quietly makes people rich/successful:", why: "'Boring' disarms skepticism; 'quietly' = hidden truth" },
+  { id: 39, category: "Transformation", hook: "Here's what I'd do differently if I were starting over:", why: "Hindsight wisdom = compressed learnings for you" },
+  { id: 40, category: "Transformation", hook: "Nobody claps for this method, but it works every time.", why: "Underdog framing + reliable result = intrigue" },
+
+  // CONTRARIAN
+  { id: 41, category: "Contrarian", hook: "Unpopular opinion: [common belief] is actually holding you back.", why: "Challenges tribe wisdom; makes people read to agree/disagree" },
+  { id: 42, category: "Contrarian", hook: "Everyone tells you to do [X]. I say the opposite.", why: "Defiance + confidence = instant attention" },
+  { id: 43, category: "Contrarian", hook: "The productivity advice that's secretly making you less productive:", why: "Ironic twist on expected content" },
+  { id: 44, category: "Contrarian", hook: "I deleted [popular thing] and my [metric] doubled. Here's why.", why: "Counterintuitive data point demands explanation" },
+  { id: 45, category: "Contrarian", hook: "Hard truth: The reason you're not [achieving goal] is you.", why: "Accountability mirror — uncomfortable but engaging" },
+  { id: 46, category: "Contrarian", hook: "The [industry] lie I believed for years:", why: "Self-correction + industry critique = trust builder" },
+  { id: 47, category: "Contrarian", hook: "You've been doing [common activity] wrong. Here's proof.", why: "'Proof' promises evidence not just opinion" },
+  { id: 48, category: "Contrarian", hook: "Hustle culture won't make you rich. This will.", why: "Attacks popular belief + offers alternative" },
+  { id: 49, category: "Contrarian", hook: "The more I learn about [topic], the less I believe [common wisdom].", why: "Growth mindset + intellectual honesty" },
+  { id: 50, category: "Contrarian", hook: "Forget [trendy thing]. The unsexy truth about [topic]:", why: "Anti-trend stance + 'unsexy' = real, not hype" },
+
+  // RELATABILITY
+  { id: 51, category: "Relatability", hook: "If you've ever felt [specific pain], this is for you.", why: "Exact emotional targeting = immediate recognition" },
+  { id: 52, category: "Relatability", hook: "This is the conversation nobody has with you before [life event].", why: "Unpreparedness = protective reading" },
+  { id: 53, category: "Relatability", hook: "For everyone grinding with no results yet — read this.", why: "Emotional solidarity + hope injection" },
+  { id: 54, category: "Relatability", hook: "You're not lazy. Your system is broken. Here's the fix:", why: "Reframes identity shame into solvable problem" },
+  { id: 55, category: "Relatability", hook: "Why you keep starting but never finishing (it's not discipline):", why: "Removes blame + curiosity about real cause" },
+  { id: 56, category: "Relatability", hook: "The feeling of [specific experience] is actually a sign that:", why: "Reframes familiar emotion into insight" },
+  { id: 57, category: "Relatability", hook: "I used to think I was the problem. Then I learned this.", why: "Self-doubt to self-understanding arc" },
+  { id: 58, category: "Relatability", hook: "This is for the [person] who feels stuck but doesn't know why.", why: "Hyper-targeted + validates confusion as experience" },
+  { id: 59, category: "Relatability", hook: "Nobody talks about the [emotion] that comes after [success/event].", why: "Taboo emotional truth = deeply shareable" },
+  { id: 60, category: "Relatability", hook: "If [common struggle] feels impossible right now, here's why:", why: "Normalizes struggle + promises explanation" },
+
+  // LISTS & FRAMEWORKS
+  { id: 61, category: "Lists & Frameworks", hook: "[X] things I know at [age] I wish I knew at [younger age]:", why: "Age authority + time travel shortcut" },
+  { id: 62, category: "Lists & Frameworks", hook: "The 5-step framework I used to [achieve specific result]:", why: "Structure implies repeatability and control" },
+  { id: 63, category: "Lists & Frameworks", hook: "[X] signs you're more [capable/successful/intelligent] than you think:", why: "Positive identity validation = high shareability" },
+  { id: 64, category: "Lists & Frameworks", hook: "[X] questions that will change how you think about [topic]:", why: "Questions engage active thinking, not passive reading" },
+  { id: 65, category: "Lists & Frameworks", hook: "The [X]-part checklist I run before every [activity]:", why: "Actionable + implies optimized system" },
+  { id: 66, category: "Lists & Frameworks", hook: "[X] red flags in [situation] most people ignore:", why: "Warning + self-diagnosis = save yourself" },
+  { id: 67, category: "Lists & Frameworks", hook: "Here are [X] books that rewired how I think about [topic]:", why: "Curation saves time; insight promise" },
+  { id: 68, category: "Lists & Frameworks", hook: "[X] things that look productive but are secretly wasting your time:", why: "False productivity is universally relatable" },
+  { id: 69, category: "Lists & Frameworks", hook: "The [X] principles I live by that most people find strange:", why: "Counter-cultural identity + curiosity trigger" },
+  { id: 70, category: "Lists & Frameworks", hook: "[X] harsh realities about [topic] that nobody wants to say:", why: "'Harsh' + 'nobody says' = insider honesty" },
+
+  // STORY-BASED
+  { id: 71, category: "Story-Based", hook: "Three years ago I was broke/lost/stuck. Then one conversation changed everything.", why: "Pivotal moment story = compressed wisdom" },
+  { id: 72, category: "Story-Based", hook: "The email/call/meeting that changed the trajectory of my career:", why: "Single moment narrative = dramatic and relatable" },
+  { id: 73, category: "Story-Based", hook: "My biggest failure taught me more than any success. Here's the story:", why: "Vulnerability + lessons = trust and value" },
+  { id: 74, category: "Story-Based", hook: "A stranger told me [lesson] 10 years ago. I think about it every day.", why: "Long retention = profound wisdom signal" },
+  { id: 75, category: "Story-Based", hook: "The day I realized everything I'd been taught about [topic] was wrong:", why: "Revelation arc with high stakes" },
+  { id: 76, category: "Story-Based", hook: "I almost quit [pursuit] until I had this realization:", why: "Near-quitting = resilience + lesson value" },
+  { id: 77, category: "Story-Based", hook: "The moment I stopped [behavior] everything changed. Here's the story:", why: "Sacrifice-to-reward arc is deeply compelling" },
+  { id: 78, category: "Story-Based", hook: "What [mentor/person I respect] told me that I didn't want to hear:", why: "Uncomfortable wisdom is memorable wisdom" },
+  { id: 79, category: "Story-Based", hook: "10 years of [pursuit] summarized into one lesson:", why: "Compression of experience = efficiency appeal" },
+  { id: 80, category: "Story-Based", hook: "The conversation that cost me [opportunity] — and what I learned:", why: "Public failure + growth = courage and value" },
+
+  // NUMBERS & DATA
+  { id: 81, category: "Numbers & Data", hook: "I analyzed [X] [things]. Here's what the data actually shows:", why: "Research credibility + 'actually' implies surprise" },
+  { id: 82, category: "Numbers & Data", hook: "$[X] in [timeframe]. The exact breakdown:", why: "Specific number + promise of full transparency" },
+  { id: 83, category: "Numbers & Data", hook: "[X]% of people fail at [goal] because of this one thing:", why: "Statistical framing makes claim feel objective" },
+  { id: 84, category: "Numbers & Data", hook: "I tracked [habit/metric] for [timeframe]. Here's what happened:", why: "Personal experiment = authentic data" },
+  { id: 85, category: "Numbers & Data", hook: "The [X]-minute technique that saves me [hours] each week:", why: "Time math = clear ROI on reading" },
+  { id: 86, category: "Numbers & Data", hook: "[X] years of experience compressed into [number] principles:", why: "Distillation = efficiency for the reader" },
+  { id: 87, category: "Numbers & Data", hook: "I spent $[X] to learn this. You're getting it free.", why: "Cost anchoring + generosity = high perceived value" },
+  { id: 88, category: "Numbers & Data", hook: "The number [X] changed how I approach everything in [area]:", why: "Mysterious number invites curiosity" },
+  { id: 89, category: "Numbers & Data", hook: "[X] people asked me this week. Here's the full answer:", why: "Social demand signals value of content" },
+  { id: 90, category: "Numbers & Data", hook: "After [X] attempts, I finally cracked [goal]. Here's the method:", why: "Persistence + eventual success = credible authority" },
+
+  // PATTERN INTERRUPT
+  { id: 91,  category: "Pattern Interrupt", hook: "I'm going to say something that might make you angry.", why: "Emotional provocation = compelled to read on" },
+  { id: 92,  category: "Pattern Interrupt", hook: "You already know how to [achieve goal]. You're just not doing it.", why: "Calls out gap between knowledge and action" },
+  { id: 93,  category: "Pattern Interrupt", hook: "This post will either change your life or annoy you. Either way:", why: "Bold stakes + meta-awareness = curiosity" },
+  { id: 94,  category: "Pattern Interrupt", hook: "I'm tired of pretending [common thing] is fine.", why: "Emotional authenticity + permission to agree" },
+  { id: 95,  category: "Pattern Interrupt", hook: "The real reason [common explanation] is actually wrong:", why: "Debunking the debunker = deeper truth promise" },
+  { id: 96,  category: "Pattern Interrupt", hook: "What if everything you believe about [topic] is backwards?", why: "Inversion challenge = philosophical pull" },
+  { id: 97,  category: "Pattern Interrupt", hook: "I'm going to be honest with you even if it hurts:", why: "Radical honesty framing = uncommon, thus trusted" },
+  { id: 98,  category: "Pattern Interrupt", hook: "The question you should be asking instead of [common question]:", why: "Reframes the frame itself = meta insight" },
+  { id: 99,  category: "Pattern Interrupt", hook: "Forget everything you think you know about [topic] for 2 minutes.", why: "Asks for temporary belief suspension = open mind" },
+  { id: 100, category: "Pattern Interrupt", hook: "Most content on [topic] is wrong. Here's what actually works:", why: "'Industry critique' + superior alternative" },
+];
+
+const categoryColors = {
+  "Curiosity Gap":     { accent: "#e94560", light: "#ff6b8a" },
+  "Fear & Urgency":    { accent: "#ff4444", light: "#ff7777" },
+  "Social Proof":      { accent: "#00c851", light: "#4dff7c" },
+  "Transformation":    { accent: "#4d79ff", light: "#80a0ff" },
+  "Contrarian":        { accent: "#ff8c00", light: "#ffb347" },
+  "Relatability":      { accent: "#cc44ff", light: "#e080ff" },
+  "Lists & Frameworks":{ accent: "#00cccc", light: "#4deeee" },
+  "Story-Based":       { accent: "#f0c040", light: "#f5d878" },
+  "Numbers & Data":    { accent: "#00e676", light: "#5cf599" },
+  "Pattern Interrupt": { accent: "#ff1493", light: "#ff69b4" },
+};
+
+// --- Helpers ---
+function hexToRgb(hex) {
+  const m = hex.replace('#','').match(/.{2}/g);
+  return m.map(x => parseInt(x, 16)).join(',');
+}
+
+// --- State ---
+let activeCategory = "All";
+let searchQuery = "";
+let showWhy = {};
+let copiedId = null;
+
+// --- Elements ---
+const tabsEl   = document.getElementById('tabs');
+const listEl   = document.getElementById('hooks-list');
+const countEl  = document.getElementById('count');
+const searchEl = document.getElementById('search');
+
+// --- Render categories ---
+const categories = ["All", ...Object.keys(categoryColors)];
+categories.forEach(cat => {
+  const btn = document.createElement('button');
+  btn.className = 'tab' + (cat === 'All' ? ' active' : '');
+  btn.textContent = cat;
+  if (cat === 'All') {
+    btn.style.borderColor = 'rgba(233,69,96,0.6)';
+    btn.style.background  = 'rgba(233,69,96,0.15)';
+    btn.style.color       = '#ff6b8a';
+  }
+  btn.addEventListener('click', () => {
+    activeCategory = cat;
+    updateTabs();
+    renderHooks();
+  });
+  tabsEl.appendChild(btn);
+});
+
+function updateTabs() {
+  document.querySelectorAll('.tab').forEach((btn, i) => {
+    const cat = categories[i];
+    const cc  = categoryColors[cat] || {};
+    const isActive = cat === activeCategory;
+    btn.classList.toggle('active', isActive);
+    if (isActive && cc.accent) {
+      btn.style.borderColor = cc.accent;
+      btn.style.background  = `rgba(${hexToRgb(cc.accent)}, 0.18)`;
+      btn.style.color       = cc.light;
+    } else if (isActive) {
+      btn.style.borderColor = 'rgba(233,69,96,0.6)';
+      btn.style.background  = 'rgba(233,69,96,0.15)';
+      btn.style.color       = '#ff6b8a';
+    } else {
+      btn.style.borderColor = '';
+      btn.style.background  = '';
+      btn.style.color       = '';
+    }
+  });
+}
+
+// --- Render hooks ---
+function renderHooks() {
+  const q = searchQuery.toLowerCase();
+  const filtered = hooks.filter(h => {
+    const matchCat    = activeCategory === 'All' || h.category === activeCategory;
+    const matchSearch = h.hook.toLowerCase().includes(q) || h.category.toLowerCase().includes(q);
+    return matchCat && matchSearch;
+  });
+
+  countEl.textContent = filtered.length;
+  listEl.innerHTML = '';
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<div class="no-results">No hooks match your search. Try a different term.</div>';
+    return;
+  }
+
+  filtered.forEach((hook, idx) => {
+    const cc = categoryColors[hook.category] || { accent: '#7b68ee', light: '#a090ff' };
+    const rgb = hexToRgb(cc.accent);
+
+    const card = document.createElement('div');
+    card.className = 'hook-card';
+    card.style.borderLeftColor = cc.accent;
+    card.style.animationDelay  = `${Math.min(idx * 18, 300)}ms`;
+
+    card.innerHTML = `
+      <div class="hook-inner">
+        <span class="hook-num" style="background:rgba(${rgb},0.18);color:${cc.light}">${hook.id}</span>
+        <div class="hook-body">
+          <div class="hook-cat" style="color:${cc.accent}">${hook.category}</div>
+          <div class="hook-text">"${hook.hook}"</div>
+          <div class="why-box${showWhy[hook.id] ? ' visible' : ''}"
+               id="why-${hook.id}"
+               style="background:rgba(${rgb},0.08);border:1px solid rgba(${rgb},0.22);color:${cc.light}">
+            🧠 <strong>Why it works:</strong> ${hook.why}
+          </div>
+          <div class="hook-actions">
+            <button class="btn copy-btn" id="copy-${hook.id}" data-id="${hook.id}" data-text="${escapeAttr(hook.hook)}">
+              ${copiedId === hook.id ? '✓ Copied!' : 'Copy Hook'}
+            </button>
+            <button class="btn why-btn${showWhy[hook.id] ? ' why-active' : ''}"
+                    id="why-btn-${hook.id}" data-id="${hook.id}"
+                    style="${showWhy[hook.id] ? `background:rgba(${rgb},0.18);border-color:${cc.accent};color:${cc.light}` : ''}">
+              🧠 ${showWhy[hook.id] ? 'Hide Why' : 'Why it works'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    listEl.appendChild(card);
+  });
+
+  // Event delegation
+  listEl.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id   = parseInt(btn.dataset.id);
+      const text = btn.dataset.text;
+      navigator.clipboard.writeText(text).catch(() => {});
+      copiedId = id;
+      btn.textContent = '✓ Copied!';
+      const cc = categoryColors[hooks.find(h=>h.id===id)?.category] || {};
+      if (cc.accent) {
+        btn.style.borderColor = cc.accent;
+        btn.style.background  = `rgba(${hexToRgb(cc.accent)},0.25)`;
+        btn.style.color       = cc.light;
+      }
+      setTimeout(() => {
+        copiedId = null;
+        btn.textContent = 'Copy Hook';
+        btn.style.borderColor = '';
+        btn.style.background  = '';
+        btn.style.color       = '';
+      }, 1800);
+    });
+  });
+
+  listEl.querySelectorAll('.why-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.id);
+      showWhy[id] = !showWhy[id];
+      const whyBox = document.getElementById(`why-${id}`);
+      const hook   = hooks.find(h => h.id === id);
+      const cc     = categoryColors[hook?.category] || { accent: '#7b68ee', light: '#a090ff' };
+      const rgb    = hexToRgb(cc.accent);
+      if (showWhy[id]) {
+        whyBox.classList.add('visible');
+        btn.classList.add('why-active');
+        btn.style.background   = `rgba(${rgb},0.18)`;
+        btn.style.borderColor  = cc.accent;
+        btn.style.color        = cc.light;
+        btn.textContent        = '🧠 Hide Why';
+      } else {
+        whyBox.classList.remove('visible');
+        btn.classList.remove('why-active');
+        btn.style.background  = '';
+        btn.style.borderColor = '';
+        btn.style.color       = '';
+        btn.textContent       = '🧠 Why it works';
+      }
+    });
+  });
+}
+
+function escapeAttr(str) {
+  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// --- Search ---
+searchEl.addEventListener('input', () => {
+  searchQuery = searchEl.value;
+  renderHooks();
+});
+
+// --- Init ---
+renderHooks();
+</script>
+</body>
+</html>
